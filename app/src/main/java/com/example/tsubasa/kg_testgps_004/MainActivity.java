@@ -1,5 +1,6 @@
 package com.example.tsubasa.kg_testgps_004;
 
+import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
@@ -12,7 +13,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements LocationListener {
+public class MainActivity extends Activity implements LocationListener {
 
     private SurfaceView surfaceView;
     private RPGView mainRPGView;
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         Button button_left = (Button) findViewById(R.id.button_left);
         Button button_right = (Button) findViewById(R.id.button_right);
 
-        // ボタンに OnClickListener インターフェースを実装する
+        // UPキーのクリックアクション設定
         button_up.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 //Toast.makeText(MainActivity.this, "「↑」クリックされました！", Toast.LENGTH_LONG).show();
             }
         });
+        // DOWNキーのクリックアクション設定
         button_down.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 //Toast.makeText(MainActivity.this, "「↓」クリックされました！", Toast.LENGTH_LONG).show();
             }
         });
+        // LEFTキーのクリックアクション設定
         button_left.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -62,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 //Toast.makeText(MainActivity.this, "「←」クリックされました！", Toast.LENGTH_LONG).show();
             }
         });
+        // RIGHTキーのクリックアクション設定
         button_right.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -69,6 +73,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                //Toast.makeText(MainActivity.this, "「→」クリックされました！", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        mainRPGView.vWidth = surfaceView.getWidth();
+        mainRPGView.vHeight = surfaceView.getHeight();
     }
 
 

@@ -14,11 +14,13 @@ public class CommonConstants {
     public static final int S_ESCAPE = 6;
 
     //画面サイズ定数
-    public static final int D_WAIDTH = 360;
-    public static final int D_HEIGTH = 280;
+    public static final int D_WAIDTH = 480;
+    public static final int D_HEIGTH = 240;
 
     //フィールドビットマップサイズ
-    public static final int BMP_SIZE = 120;
+    public static final int BMP_SIZE = 40 * 3;//40=120
+    public static final int PLAYER_SPACE_X = 3;//MAP描画時の中心プレイヤーX座標補正
+    public static final int PLAYER_SPACE_Y = 3;//MAP描画時の中心プレイヤーX座標補正
 
     //キー定数
     public static final int KEY_NONE = -1;
@@ -69,7 +71,7 @@ public class CommonConstants {
     //敵定数
     public  static final String EN_NAME[] = {"ザコ", "ボス"};
     public static final int EN_MAXHP[] = {20, 50};
-    public static final int EN_ATTACK[] = {5, 50};
-    public static final int EN_DEFENCE[] = {0, 50};
+    public static final int EN_ATTACK[] = {5, 10};
+    public static final int EN_DEFENCE[] = {0, 10};
     public static final int EN_EXP[] = {10, 50};
 }

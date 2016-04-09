@@ -123,10 +123,10 @@ public class Graphics {
     /**
      * 矩形の描画
      *
-     * @param x
-     * @param y
-     * @param w
-     * @param h
+     * @param x 幅開始位置
+     * @param y 高さ開始位置
+     * @param w 幅
+     * @param h 高さ
      * @return 無し
      */
     public void fillRect(int x, int y, int w, int h) {

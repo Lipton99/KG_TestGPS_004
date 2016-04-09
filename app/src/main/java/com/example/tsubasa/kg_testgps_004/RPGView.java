@@ -36,9 +36,13 @@ public class RPGView extends SurfaceView implements SurfaceHolder.Callback, Runn
     //乱数の取得
     private static Random rand = new Random();
 
+    //画面サイズ
+    public int vWidth;
+    public int vHeight;
+
     //勇者パラメーター
     private int yuX = 1;
-    private int yuY = 2;
+    private int yuY = 1;
     private int yuDirection = 3;
     private int yuLV = 1;
     private int yuHP = 30;
@@ -91,15 +95,15 @@ public class RPGView extends SurfaceView implements SurfaceHolder.Callback, Runn
             holder.addCallback(this);
 
             //画面サイズ指定
+            /*
             Display display = activity.getWindowManager().getDefaultDisplay();
-            Point p = new Point();
-            display.getSize(p);
-            int dw = D_HEIGTH * p.x / p.y;
-            getHolder().setFixedSize(dw, D_HEIGTH);
+            vWidth = display.getWidth();
+            vHeight = display.getHeight();
+            */
 
             //グラフィック生成
             g = new Graphics(holder);
-            g.setOrigin((dw - D_WAIDTH) / 2, 0);
+            g.setOrigin(0, 0);
 
         } catch (Exception e) {
             //エラー処理
@@ -152,7 +156,7 @@ public class RPGView extends SurfaceView implements SurfaceHolder.Callback, Runn
                     if (scene == S_START) {
                         scene = S_MAP;
                         yuX = 1;
-                        yuY = 2;
+                        yuY = 1;
                         yuLV = 1;
                         yuHP = 30;
                         yuEXP = 0;
@@ -202,6 +206,15 @@ public class RPGView extends SurfaceView implements SurfaceHolder.Callback, Runn
             //エラー処理
             e.printStackTrace();
         }
+    }
+
+    /**
+     * ファイルロード
+     * @param
+     * @return 無し
+     */
+    private void gameDataLoad() {
+        //TODO:ファイル出力、ファイル読み込み
     }
 
     /**
@@ -264,7 +277,7 @@ public class RPGView extends SurfaceView implements SurfaceHolder.Callback, Runn
             if (1 % 2 == 0) {
                 g.lock();
                 g.setColor(Color.rgb(255, 255, 255));
-                g.fillRect(0, 0, D_WAIDTH, D_HEIGTH);
+                g.fillRect(0, 0, vWidth, vHeight);
                 g.unlock();
             } else {
                 drawBattle(EN_NAME[enType] + "の攻撃");
@@ -317,11 +330,11 @@ public class RPGView extends SurfaceView implements SurfaceHolder.Callback, Runn
         if (enType == 1) {
             g.lock();
             g.setColor(Color.rgb(0, 0, 0));
-            g.fillRect(0, 0, D_WAIDTH, D_HEIGTH);
+            g.fillRect(0, 0, vWidth, vHeight);
             g.setColor(Color.rgb(255, 255, 255));
             g.setTextSize(32);
             String str = "Fin...";
-            g.drawText(str, (D_WAIDTH - g.measureText(str)) / 2, 180 - (int) g.getFontMetrics().top);
+            g.drawText(str, (vWidth - g.measureText(str)) / 2, vHeight / 2 - (int) g.getFontMetrics().top);
             g.unlock();
             waitSelect();
             init = S_START;
@@ -369,7 +382,7 @@ public class RPGView extends SurfaceView implements SurfaceHolder.Callback, Runn
      * @return 無し
      */
     private void menuCommand() throws InterruptedException {
-        drawBattle("    1.攻撃    2.逃げる");
+        drawBattle("↑.攻撃 \n ↓.逃げる");
         key = KEY_NONE;
         while (init == -1) {
             if (key == KEY_1) init = S_ATTACK;
@@ -395,7 +408,7 @@ public class RPGView extends SurfaceView implements SurfaceHolder.Callback, Runn
             } else {
                 g.setColor(Color.rgb(255, 255, 255));
             }
-            g.fillRect(0, 0, D_WAIDTH, D_HEIGTH);
+            g.fillRect(0, 0, vWidth, vHeight);
             g.unlock();
             sleep(100);
         }
@@ -420,21 +433,19 @@ public class RPGView extends SurfaceView implements SurfaceHolder.Callback, Runn
      */
     private void drawMap() {
         g.lock();
-        for (int j = -3; j <= 3; j++) {
-            for (int i = -5; i <= 5; i++) {
-                int idx = 3;
-                if (0 <= yuX + i && yuX + i < MAP[0].length && 0 <= yuY + j && yuY + j < MAP.length) {
-                    idx = MAP[yuY + j][yuX + i];
+        for (int j = 0; j <= MAP.length + PLAYER_SPACE_Y; j++) {
+            for (int i = 0; i <= MAP[0].length + PLAYER_SPACE_X; i++) {
+                int idx = 3;//MAP範囲外のBitMap(山)
+                if (0 <= yuX - PLAYER_SPACE_X + i && yuX - PLAYER_SPACE_X + i < MAP[0].length && 0 <= yuY - PLAYER_SPACE_Y + j && yuY - PLAYER_SPACE_Y + j < MAP.length) {
+                    idx = MAP[yuY - PLAYER_SPACE_Y + j][yuX - PLAYER_SPACE_X + i];
                 }
-                g.drawBitmap(bmp[BMP_FIELD][idx], D_WAIDTH / 2 - (BMP_SIZE / 2)  + BMP_SIZE * i, D_HEIGTH / 2 - (BMP_SIZE / 2) + BMP_SIZE * j);
+                g.drawBitmap(bmp[BMP_FIELD][idx], BMP_SIZE * i,BMP_SIZE * j);
             }
         }
-        g.drawBitmap(bmp[BMP_PLAYER][yuDirection], D_WAIDTH / 2 - BMP_SIZE / 2, D_HEIGTH / 2 - BMP_SIZE / 2 );
-
+        g.drawBitmap(bmp[BMP_PLAYER][yuDirection], BMP_SIZE * PLAYER_SPACE_X , BMP_SIZE * PLAYER_SPACE_Y );
         drawStatus();
         g.unlock();
     }
-
 
     /**
      * モンスターエンカウント計算
@@ -492,6 +503,7 @@ public class RPGView extends SurfaceView implements SurfaceHolder.Callback, Runn
         }
         return flag;
     }
+
     /**
      * 戦闘画面の描画(HP判定)
      *
@@ -519,18 +531,18 @@ public class RPGView extends SurfaceView implements SurfaceHolder.Callback, Runn
             }
             g.lock();
             g.setColor(color);
-            g.fillRect(0, 0, D_WAIDTH, D_HEIGTH);
+            g.fillRect(0, 0, vWidth, vHeight);
             drawStatus();
             if (visible == true) {
-                g.drawBitmap(bmp[BMP_ENEMY][enType], (D_WAIDTH - bmp[BMP_ENEMY][enType].getWidth()) / 2, D_HEIGTH - 100 - bmp[BMP_ENEMY][enType].getHeight());
+                g.drawBitmap(bmp[BMP_ENEMY][enType], (vWidth - bmp[BMP_ENEMY][enType].getWidth()) / 2, (vHeight - bmp[BMP_ENEMY][enType].getHeight()) / 4);
             }
             g.setColor(Color.rgb(255, 255, 255));
-            g.fillRect((D_WAIDTH - 504) / 2, D_HEIGTH - 122, 504, 104);
+            g.fillRect(vWidth / 4 - 2, (vHeight * 3 / 4) - 2, vWidth / 2 + 4, 204);//白
             g.setColor(color);
-            g.fillRect((D_WAIDTH - 500) / 2, D_HEIGTH - 120, 500, 100);
+            g.fillRect(vWidth / 4, (vHeight * 3 / 4), vWidth / 2, 200);//黒
             g.setColor(Color.rgb(255, 255, 255));
             g.setTextSize(32);
-            g.drawText(message, (D_WAIDTH - 500) / 2 + 50, 370 - (int) g.getFontMetrics().top);
+            g.drawText(message, vWidth / 4 + 10, vHeight * 3 / 4 - (int) g.getFontMetrics().top);
             g.unlock();
         } catch (Exception e) {
             //エラー処理
@@ -553,58 +565,18 @@ public class RPGView extends SurfaceView implements SurfaceHolder.Callback, Runn
                 color = Color.rgb(0, 0, 0);
             }
             g.setColor(Color.rgb(255, 255, 255));
-            g.fillRect((D_WAIDTH - 504) / 2, 8, 504, 54);
+            //(右上左下 )
+            g.fillRect(8, 8, vWidth - 18, 54);
             g.setColor(color);
-            g.fillRect((D_WAIDTH - 500) / 2, 10, 500, 50);
+            g.fillRect(10, 10, vWidth -22 , 50);
             g.setColor(Color.rgb(255, 255, 255));
             g.setTextSize(32);
-            g.drawText("勇者 LV" + yuLV + " HP" + yuHP + " /" + YU_MAXHP[yuLV], (D_WAIDTH - 500) / 2 + 80, 15 - (int) g.getFontMetrics().top);
+            g.drawText("勇者 LV" + yuLV + " HP" + yuHP + " /" + YU_MAXHP[yuLV], 20 , 15 - (int) g.getFontMetrics().top);
         } catch (Exception e) {
             //エラー処理
             e.printStackTrace();
         }
     }
-
-    /**
-     * 画面タッチ時の処理
-     *
-     * @param　
-     * @return 無し
-     */
-/*
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        try {
-            int touchX = (int) (event.getX() * D_WAIDTH / getWidth());
-            int touchY = (int) (event.getY() * D_HEIGTH / getHeight());
-            int touchAction = event.getAction();
-            if (touchAction == MotionEvent.ACTION_DOWN) {
-
-                if (scene == S_MAP) {
-                    if (Math.abs(touchX - D_WAIDTH / 2) > Math.abs(touchY - D_HEIGTH / 2)) {
-                        key = (touchX - D_WAIDTH / 2 < 0) ? KEY_LEFT : KEY_RIGHT;
-                    } else {
-                        key = (touchY - D_HEIGTH / 2 < 0) ? KEY_UP : KEY_DOWN;
-                    }
-                } else if (scene == S_APPEAR || scene == S_ATTACK || scene == S_DEFENCE || scene == S_ESCAPE) {
-                    key = KEY_SELECT;
-                } else if (scene == S_COMMAND) {
-                    if (D_WAIDTH / 2 - 250 < touchX && touchX < D_WAIDTH / 2 && D_HEIGTH - 190 < touchY && touchY < D_HEIGTH) {
-                        key = KEY_1;
-                    } else if (D_WAIDTH / 2 < touchX && touchX < D_WAIDTH / 2 + 250 && D_HEIGTH - 190 < touchY && touchY < D_HEIGTH) {
-                        key = KEY_2;
-                    }
-                }
-            }
-            return true;
-        } catch (Exception e) {
-            //エラー処理
-            e.printStackTrace();
-            return false;
-        }
-    }
-*/
-
 
     /**
      * 決定キー待ち
